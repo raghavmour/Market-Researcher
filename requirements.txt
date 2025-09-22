@@ -1,0 +1,16 @@
+langgraph
+langchain_google_genai
+langchain_openai
+langchain
+playwright
+langchain-groq
+langchain_tavily
+trafilatura
+langchain_community
+langchain_cohere
+faiss-cpu
+rank_bm25
+pypdf
+beautifulsoup4
+streamlit
+python-dotenv
