@@ -20,6 +20,13 @@ The Market Researcher is an AI-powered agent designed to automate the process of
 * The agent does not yet feature advanced data visualizations.
 * There can be some latency due to the multi-step process of embeddings, search, and summarization.
 
+## Future Improvements
+* **Advanced Data Visualizations**: Integrate libraries like Matplotlib, Seaborn, or Plotly to create charts and graphs for a more intuitive understanding of market data.
+* **Wider Range of Data Sources**: Expand data gathering to include sources like social media, news articles, and financial reports for a more comprehensive analysis.
+* **Interactive Reports**: Allow users to interact with the generated reports by clicking on data points to get more detailed information.
+* **Caching**: Implement a caching mechanism to store the results of previous searches and reduce latency for recurring queries.
+* **User Feedback**: Add a feature for users to provide feedback on the generated reports to help fine-tune the AI model and improve the quality of the generated insights.
+
 ## Tools and APIs Used
 
 * **Programming Language**: Python
