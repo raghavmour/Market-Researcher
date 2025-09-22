@@ -1,42 +1,40 @@
 # Market Researcher
 
-## What the Agent Does
+## 1. Overview
+The **Market Researcher Agent** is an AI-powered tool designed to **gather and summarize competitor information**. It automates collecting data about competitors, analyzing their offerings, and generating actionable insights. This project was built for the **AI Product Developer Challenge**.
 
-The Market Researcher is an AI-powered agent designed to automate the process of gathering and summarizing competitor and market information. Users can input a company, product, or market topic, and the agent will generate a comprehensive analysis report. This tool is built for the AI Product Developer Challenge.
+---
 
-## Key Features and Limitations
-
-### Key Features
-* **Competitor Data Gathering**: The agent fetches relevant information about competitors from online sources using Tavily Search.
-* **Embeddings & Semantic Search**: It uses Cohere embeddings for representing and comparing text data.
-* **Large Language Model**: The agent leverages `meta-llama/llama-4-maverick-17b-128e-instruct` as its base Large Language Model for summarization and inference.
-* **Automated Summarization**: It condenses large amounts of data into concise, readable insights.
-* **User Interface**: The agent provides a simple and interactive user interface built with Streamlit.
-* **Exportable Reports**: The generated summaries and analyses can be saved for strategic planning or presentations.
+## 2. Key Features
+- **Competitor Data Gathering**: Fetches relevant information about competitors from online sources using Tavily Search.
+- **Embeddings & Semantic Search**: Uses Cohere embeddings to represent and compare text data.
+- **Large Language Model**: Uses `meta-llama/llama-4-maverick-17b-128e-instruct` as the base LLM for summarization, inference, and instruction following.
+- **Automated Summarization**: Converts large data into concise, readable insights.
+- **User Interface**: Simple interactive UI via Streamlit.
+- **Exportable Reports**: Summaries / analysis can be saved for strategy or presentations.
 
 ### Limitations
-* The agent's knowledge is dependent on publicly available data, which means some competitor information might be missing or not up-to-date.
-* The performance and cost are heavily dependent on the chosen LLM and embedding service.
-* The agent does not yet feature advanced data visualizations.
-* There can be some latency due to the multi-step process of embeddings, search, and summarization.
+- Dependence on publicly available data; some competitor information may be missing or outdated.
+- Performance and cost depend heavily on the chosen LLM and embedding service.
+- No advanced visualizations yet.
+- Some latency possible due to embeddings + search + summarization chain.
 
-## Future Improvements
-* **Advanced Data Visualizations**: Integrate libraries like Matplotlib, Seaborn, or Plotly to create charts and graphs for a more intuitive understanding of market data.
-* **Wider Range of Data Sources**: Expand data gathering to include sources like social media, news articles, and financial reports for a more comprehensive analysis.
-* **Interactive Reports**: Allow users to interact with the generated reports by clicking on data points to get more detailed information.
-* **Caching**: Implement a caching mechanism to store the results of previous searches and reduce latency for recurring queries.
-* **User Feedback**: Add a feature for users to provide feedback on the generated reports to help fine-tune the AI model and improve the quality of the generated insights.
+---
 
-## Tools and APIs Used
+## 3. Tools and APIs Used
+- **Programming Language**: Python 3.10+
+- **LLM**: `meta-llama/llama-4-maverick-17b-128e-instruct`
+- **Embeddings**: Cohere Embeddings API
+- **Search**: Tavily Search (for retrieving relevant documents/web pages)
+- **Frameworks & Libraries**:
+  - Streamlit (UI)
+  - LangChain & LangGraph (Orchestration)
+  - beautifulsoup4 (HTML parsing)
+  - FAISS (Vector Store)
 
-* **Programming Language**: Python
-* **AI Models**: `meta-llama/llama-4-maverick-17b-128e-instruct`
-* **Multi-Agent Frameworks**: LangChain, LangGraph
-* **UI**: Streamlit
-* **Embeddings**: Cohere Embeddings API
-* **Search**: Tavily Search
+---
 
-## Setup Instructions
+## 4. Setup Instructions
 
 1.  **Clone the repository:**
     ```bash
@@ -65,3 +63,31 @@ The Market Researcher is an AI-powered agent designed to automate the process of
     ```bash
     streamlit run app.py
     ```
+
+---
+
+## 5. Architecture Diagram
+
+```mermaid
+graph TD
+    A[User Input: Research Query] --> B{Main Graph};
+
+    subgraph B [Main Graph]
+        C[Planner Node] --> D{For each sub-query};
+        D --> E[Sub_graph];
+        E --> F[Collect Summaries];
+        F --> G[Report Generator Node];
+    end
+
+    subgraph E [Sub-Graph Execution]
+        direction LR
+        H[WebSearchTool] --> I[Web_Retriver];
+        I --> J[Retriever];
+        J --> K[Summarizer Node];
+    end
+
+    G --> L[Final Report];
+    L --> M[Display to User];
+
+    style B fill:#f9f9f9,stroke:#333,stroke-width:2px
+    style E fill:#e6f7ff,stroke:#333,stroke-width:2px
