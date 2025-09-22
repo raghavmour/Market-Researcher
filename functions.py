@@ -1,5 +1,5 @@
 import os
-import sreamlit as st
+import streamlit as st
 from dotenv import load_dotenv
 
 if st.secrets:
@@ -377,3 +377,4 @@ graph.add_edge(START, "Planner")
 graph.add_edge("generator", END)
 
 app = graph.compile()
+
