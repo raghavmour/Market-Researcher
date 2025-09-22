@@ -187,29 +187,56 @@ from bs4 import BeautifulSoup
 
 #   state["parsed_content"] = full_text
 #   return state
+import requests
+from bs4 import BeautifulSoup
+
 def Web_Retriver(url: str | dict):
+    """
+    Fetches and parses the main textual content from a webpage.
+    If a URL is unresponsive or fails, it is skipped and returns an empty parsed_content list.
+    """
+
+    # --- Normalize input ---
     if isinstance(url, dict):
         url = url.get("url")
-    # print(f"[DocumentRetriever] Running {url} URL fetches...")
 
     full_text = []
 
-    html = requests.get(url, timeout=10).text
-    soup = BeautifulSoup(html, "html.parser")
+    if not url or not isinstance(url, str):
+        # Invalid URL, skip gracefully
+        return {"parsed_content": full_text}
 
-    # Attempt to find the main content (adjust for specific sites if needed)
-    content_div = soup.find("div", {"class": "mw-parser-output"}) or soup.body
-    if content_div:
-        paragraphs = content_div.find_all("p")
-        page_text = "\n".join(
-            [p.get_text(strip=True) for p in paragraphs if p.get_text(strip=True)]
-        )
-        full_text.append(page_text)
+    try:
+        # Try to fetch the page with a timeout
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()  # Raises for HTTP errors like 404, 500
 
-    else:
-        print(f"[Warning] Could not find content for URL: {url}")
+        # Parse the HTML content
+        soup = BeautifulSoup(response.text, "html.parser")
 
-    return {"parsed_content": full_text}
+        # Try to locate the main content
+        content_div = soup.find("div", {"class": "mw-parser-output"}) or soup.body
+        if content_div:
+            paragraphs = content_div.find_all("p")
+            page_text = "\n".join(
+                [p.get_text(strip=True) for p in paragraphs if p.get_text(strip=True)]
+            )
+            if page_text.strip():
+                full_text.append(page_text)
+
+        return {"parsed_content": full_text}
+
+    except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
+        # Skip unresponsive URLs silently
+        return {"parsed_content": full_text}
+
+    except requests.exceptions.HTTPError:
+        # Skip URLs with bad HTTP status codes
+        return {"parsed_content": full_text}
+
+    except Exception:
+        # Catch-all for unexpected issues, skip silently
+        return {"parsed_content": full_text}
 
 
 def parallel_web_search(state: SubState) -> SubState:
@@ -385,5 +412,6 @@ graph.add_edge(START, "Planner")
 graph.add_edge("generator", END)
 
 app = graph.compile()
+
 
 
