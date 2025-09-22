@@ -67,8 +67,16 @@ subquery_prompt = ChatPromptTemplate.from_messages(
     [
         (
             "system",
-            """You are an expert market research planner. Your role is to break down a user's research topic into a series of specific, answerable sub-questions.
-Based on the topic: "{query}", please generate a list of 3 to 5 key questions that need to be researched to create a comprehensive market analysis report.
+            """You are an expert in competitor analysis and market research. 
+Your task is to break down the user's topic into 3 to 5 detailed, answerable sub-questions focused on understanding the competitive landscape.
+
+Based on the topic: "{query}", generate key questions that will help analyze:
+1. The main competitors in this space,
+2. Their strengths and weaknesses,
+3. Market positioning and strategies,
+4. Customer perception and differentiators.
+
+Ensure the questions are specific and actionable, leading to insights that will support a comprehensive competitor analysis report.
 """,
         ),
         ("user", "{query}"),
@@ -377,4 +385,5 @@ graph.add_edge(START, "Planner")
 graph.add_edge("generator", END)
 
 app = graph.compile()
+
 
