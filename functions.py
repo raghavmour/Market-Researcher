@@ -252,7 +252,14 @@ from langchain_cohere import CohereEmbeddings
 
 
 def Retriver(state: dict) -> dict:
-    chunks = state["parsed_content"]  # should be a list of text chunks
+    # Get parsed content
+    chunks = state.get("parsed_content", [])
+
+    # Check if there is any content to process
+    if not chunks or not any(chunks):
+        # No content, skip retriever setup
+        state["retrieved_docs"] = {}
+        return state
 
     # Create embedding
     embedding = CohereEmbeddings(
@@ -261,31 +268,47 @@ def Retriver(state: dict) -> dict:
         user_agent="langchain",
     )
 
-    # Combine and split content
-    full_text = "\n".join(chunk for chunk in chunks)
+    # Combine text into one string
+    full_text = "\n".join(chunk for chunk in chunks if chunk.strip())
+
+    # If the full_text is empty, return early
+    if not full_text.strip():
+        state["retrieved_docs"] = {}
+        return state
+
+    # Split content into smaller documents
     splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
     splits = splitter.create_documents([full_text])
+
+    # If no valid splits are created, return safely
+    if not splits:
+        state["retrieved_docs"] = {}
+        return state
 
     # Create retrievers
     vectordb = FAISS.from_documents(splits, embedding=embedding)
     faiss_retriever = vectordb.as_retriever(search_kwargs={"k": 4})
+
     bm25_retriever = BM25Retriever.from_documents(splits)
     bm25_retriever.k = 3
 
     ensemble_retriever = EnsembleRetriever(
-        retrievers=[faiss_retriever, bm25_retriever], weights=[0.5, 0.5]
+        retrievers=[faiss_retriever, bm25_retriever],
+        weights=[0.5, 0.5],
     )
 
     # Map subqueries to retrieved documents
+    query = state.get("m_query", "")
     query_doc_map = {}
-    query = state["m_query"]
-    retrieved_docs = ensemble_retriever.invoke(query)
-    query_doc_map[query] = retrieved_docs
-    # print(f"[Summarizer] Retrieved {len(retrieved_docs)} docs for query: '{query}'")
 
-    # Save to state
+    if query.strip():
+        retrieved_docs = ensemble_retriever.invoke(query)
+        query_doc_map[query] = retrieved_docs
+
+    # Save retrieved docs to state
     state["retrieved_docs"] = query_doc_map
     return state
+
 
 
 from typing import Dict, List
@@ -412,6 +435,7 @@ graph.add_edge(START, "Planner")
 graph.add_edge("generator", END)
 
 app = graph.compile()
+
 
 
 
