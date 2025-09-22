@@ -1,5 +1,5 @@
 import os
-import sreamlit as st
+import streamlit as st
 from dotenv import load_dotenv
 
 if st.secrets:
@@ -100,3 +100,4 @@ if "report" in st.session_state and st.session_state.report:
         st.markdown('<div class="report-container">', unsafe_allow_html=True)
         st.markdown(st.session_state.report, unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
+
